@@ -49,7 +49,8 @@ public class ComparableObjectItemTest {
 
     @Test
     public void hashCodeTest(){
-
+        assertEquals(firstItem.hashCode(), firstItem.hashCode());
+        assertNotEquals(firstItem.hashCode(), secondItem.hashCode());
     }
 
 }
