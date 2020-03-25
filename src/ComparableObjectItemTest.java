@@ -3,8 +3,7 @@ import org.jfree.data.ComparableObjectItem;
 
 import javax.swing.plaf.synth.SynthStyle;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ComparableObjectItemTest {
 
@@ -15,8 +14,8 @@ public class ComparableObjectItemTest {
     @Before
     public void setUp(){
         //arrange
-        x = new Integer(1);
-        a = new Integer(2);
+        x = 1;
+        a = 2;
         y = new Object();
         b = new Object();
         firstItem = new ComparableObjectItem(x, y);
@@ -42,7 +41,9 @@ public class ComparableObjectItemTest {
     }
 
     @Test
-    public void cloneTest(){
+    public void cloneTest() throws CloneNotSupportedException {
+        ComparableObjectItem temp = (ComparableObjectItem) firstItem.clone();
+        assertEquals(temp, firstItem);
 
     }
 
