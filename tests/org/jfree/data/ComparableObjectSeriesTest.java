@@ -1,5 +1,6 @@
 package org.jfree.data;
 
+import org.jfree.data.general.SeriesException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -56,6 +57,14 @@ public class ComparableObjectSeriesTest {
         int actual = series.indexOf(4);
 
         assertEquals(0, actual);
+    }
+
+    @Test(expected = SeriesException.class)
+    public void Update_UpdatingNonExistingItem_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+
+        series.update(2, null);
     }
 
 }
