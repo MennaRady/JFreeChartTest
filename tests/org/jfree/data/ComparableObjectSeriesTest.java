@@ -149,4 +149,90 @@ public class ComparableObjectSeriesTest {
         series.delete(start, end);
     }
 
+    @Test
+    /// Passing same/identical series
+    public void Equals_SameSeries_True(){
+        series = new ComparableObjectSeries(key);
+
+        assertTrue(series.equals(series));
+    }
+
+    @Test
+    /// Passing object of different instance.
+    public void Equals_DifferentInstance_False(){
+        ComparableObjectItem Item = new ComparableObjectItem(key, new Object());
+        series = new ComparableObjectSeries(key);
+
+        assertFalse(series.equals(Item));
+    }
+
+    @Test
+    /// Passing a series with different data size.
+    public void Equals_DifferentDataSize_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(key);
+        series1.add(1, null);
+        series1.add(2, null);
+        series2.add(1, null);
+
+        assertFalse(series1.equals(series2));
+    }
+
+    @Test
+    /// Passing a series with different data.
+    public void Equals_DifferentData_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(key);
+        series1.add(1, null);
+        series2.add(2, null);
+
+        assertFalse(series1.equals(series2));
+    }
+
+    @Test
+    /// Passing a series with different key.
+    public void Equals_DifferentKey_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(1);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(2);
+        series1.add(1, null);
+        series2.add(1, null);
+
+        assertFalse(series1.equals(series2));
+    }
+
+    @Test
+    /// Passing a series with different key.
+    public void Equals_DifferentDescription_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(key);
+        series1.setDescription("abc");
+        series2.setDescription("xyz");
+
+        assertFalse(series1.equals(series2));
+    }
+
+    @Test
+    /// Passing an unsorted series.
+    public void Equals_CompareToUnsortedSeries_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(key, false, true);
+        series1.add(1, null);
+        series1.add(2, null);
+        series2.add(2, null);
+        series2.add(1, null);
+
+        assertFalse(series1.equals(series2));
+    }
+
+    @Test
+    /// Passing a series that allows duplication of data.
+    public void Equals_CompareToSeriesThatAllowsDuplicateValues_False(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2 = new ComparableObjectSeries(key, true, false);
+        series1.add(1, null);
+        series2.add(1, null);
+
+        assertFalse(series1.equals(series2));
+    }
+
 }
