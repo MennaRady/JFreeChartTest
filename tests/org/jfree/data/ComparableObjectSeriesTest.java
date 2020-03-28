@@ -150,6 +150,26 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void Clear_ClearingSeries_AllDeleted(){
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+        series.add(3, null);
+
+        series.clear();
+        int actual = series.data.size();
+
+        assertEquals(0, actual);
+    }
+
+    /* @Test(expected = IndexOutOfBoundsException.class)
+    public void Clear_EmptySeries_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+
+        series.clear();
+    }*/
+
+    @Test
     /// Passing same/identical series
     public void Equals_SameSeries_True(){
         series = new ComparableObjectSeries(key);
@@ -234,7 +254,6 @@ public class ComparableObjectSeriesTest {
 
         assertFalse(series1.equals(series2));
     }
-
 
     @Test
     public void IsEmpty_EmptySeries_True(){
