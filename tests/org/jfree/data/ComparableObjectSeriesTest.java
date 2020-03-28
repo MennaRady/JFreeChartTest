@@ -5,8 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 public class ComparableObjectSeriesTest {
@@ -129,9 +128,21 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
+    public void Delete_NegativeIndex_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+
+        int start = -1;
+        int end = 2;
+
+        series.delete(start, end);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
     public void Delete_DeletingFromEmptySeries_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
-
         int start = 0;
         int end = 3;
 
