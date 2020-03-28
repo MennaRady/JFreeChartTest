@@ -269,4 +269,36 @@ public class ComparableObjectSeriesTest {
         assertFalse(series.isEmpty());
     }
 
+    @Test
+    public void Clone_CloneSeries_ReturnEquivalentSeries() throws CloneNotSupportedException {
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2;
+        series.add(1, null);
+
+        series2 = (ComparableObjectSeries) series1.clone();
+
+        assertEquals(series1, series2);
+    }
+
+    @Test
+    public void Clone_CloneSeries_NotSameSeries() throws CloneNotSupportedException {
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2;
+        series.add(1, null);
+
+        series2 = (ComparableObjectSeries) series1.clone();
+
+        assertNotSame(series1, series2);
+    }
+
+    @Test
+    public void Clone_CloneSeries_SeriesOfSameInstance() throws CloneNotSupportedException {
+        ComparableObjectSeries series1 = new ComparableObjectSeries(key);
+        ComparableObjectSeries series2;
+        series.add(1, null);
+
+        series2 = (ComparableObjectSeries) series1.clone();
+
+        assertEquals(series1.getClass(), series2.getClass());
+    }
 }
