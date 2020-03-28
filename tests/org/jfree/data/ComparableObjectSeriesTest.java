@@ -201,7 +201,7 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
-    /// Passing a series with different key.
+    /// Passing a series with different description.
     public void Equals_DifferentDescription_False(){
         ComparableObjectSeries series1 = new ComparableObjectSeries(key);
         ComparableObjectSeries series2 = new ComparableObjectSeries(key);
@@ -233,6 +233,21 @@ public class ComparableObjectSeriesTest {
         series2.add(1, null);
 
         assertFalse(series1.equals(series2));
+    }
+
+
+    @Test
+    public void IsEmpty_EmptySeries_True(){
+        series = new ComparableObjectSeries(key);
+        assertTrue(series.isEmpty());
+    }
+
+    @Test
+    public void IsEmpty_HasData_False(){
+        series = new ComparableObjectSeries(key);
+        series.add(0, null);
+
+        assertFalse(series.isEmpty());
     }
 
 }
