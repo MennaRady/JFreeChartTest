@@ -1,7 +1,11 @@
 package tests.org.jfree.data;
 import org.jfree.data.DataUtilities;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class DataUtilitiesTest {
@@ -64,6 +68,17 @@ public class DataUtilitiesTest {
         x[0][0] = 1.5;
         y[0][0] = 1.5;
         assertTrue(DataUtilities.equal(x, y));
+    }
+
+    @Test
+    public void cloneTest(){
+        double[][] temp =  DataUtilities.clone(x);
+        assertTrue(Arrays.deepEquals(temp, x));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void clone_NullValueTest(){
+        double[][] temp = DataUtilities.clone(null);
     }
 
 
