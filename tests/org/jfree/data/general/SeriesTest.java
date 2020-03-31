@@ -5,11 +5,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+
 
 class DummySeriesChangeListener implements SeriesChangeListener {
 
     @Override
     public void seriesChanged(SeriesChangeEvent seriesChangeEvent) {
+        /// do something
+    }
+}
+
+class DummyVetoableChangeListener implements VetoableChangeListener {
+
+    @Override
+    public void vetoableChange(PropertyChangeEvent propertyChangeEvent) throws PropertyVetoException {
         /// do something
     }
 }
@@ -43,6 +55,28 @@ public class SeriesTest {
 
         comparableSeries.removeChangeListener(spyListener);
         comparableSeries.fireSeriesChanged();
+
+        Mockito.verifyNoInteractions(spyListener);
+    }
+
+    @Test
+    public void AddVetoableChangeListener() throws PropertyVetoException {
+        VetoableChangeListener listener = new DummyVetoableChangeListener();
+        VetoableChangeListener spyListener = Mockito.spy(listener);
+
+        comparableSeries.addVetoableChangeListener(spyListener);
+        comparableSeries.fireVetoableChange(null, null, null);
+
+        Mockito.verify(spyListener).vetoableChange(Mockito.any());
+    }
+
+    @Test
+    public void RemoveVetoableChangeListener() throws PropertyVetoException {
+        VetoableChangeListener listener = new DummyVetoableChangeListener();
+        VetoableChangeListener spyListener = Mockito.spy(listener);
+
+        comparableSeries.removeVetoableChangeListener(spyListener);
+        comparableSeries.fireVetoableChange(null, null, null);
 
         Mockito.verifyNoInteractions(spyListener);
     }
