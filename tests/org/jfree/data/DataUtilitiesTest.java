@@ -273,9 +273,42 @@ public class DataUtilitiesTest {
         assertEquals(temp.length, doubleArray.length);
     }
 
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void createNumberArray_OutOfBoundsArrayTest(){
+        double[] doubleArray = new double[]{1.0,2.5,7.9};
+        Number[] temp = DataUtilities.createNumberArray(doubleArray);
+        assertEquals(temp[3], doubleArray[3]);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void createNumberArray_NullValueTest(){
         Number[] temp = DataUtilities.createNumberArray(null);
+    }
+
+    @Test
+    public void createNumberArray2D_StartOfArrayTest(){
+        double[][] doubleArray = new double[][]{{1.0,2.5},{3.1,5}};
+        Number[][] temp = DataUtilities.createNumberArray2D(doubleArray);
+        assertEquals(temp[0][0], doubleArray[0][0]);
+    }
+
+    @Test
+    public void createNumberArray2D_EndOfArrayTest(){
+        double[][] doubleArray = new double[][]{{1.0,2.5,7.9},{3.1,5,6.0},{4,7,9.9}};
+        Number[][] temp = DataUtilities.createNumberArray2D(doubleArray);
+        assertEquals(temp[2][2], doubleArray[2][2]);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void createNumberArray2D_OutOfBoundsArrayTest(){
+        double[][] doubleArray = new double[][]{{1.0,2.5,7.9},{3.1,5,6.0}};
+        Number[][] temp = DataUtilities.createNumberArray2D(doubleArray);
+        assertEquals(temp[3][3], doubleArray[3][3]);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createNumberArray2D_NullValueTest(){
+        Number[][] temp = DataUtilities.createNumberArray2D(null);
     }
 
 }
