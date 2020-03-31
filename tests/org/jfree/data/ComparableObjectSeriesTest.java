@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ComparableObjectSeriesTest {
     ComparableObjectSeries series;
@@ -16,6 +16,114 @@ public class ComparableObjectSeriesTest {
     public void setUp(){
         key = 1;
         series = new ComparableObjectSeries(key);
+    }
+
+    @Test
+    public void ComparableObjectSeriesTest_InitializeAttributes(){
+        series = new ComparableObjectSeries("XYZ", false, true);
+        assertEquals("XYZ", series.getKey());
+        assertFalse(series.getAutoSort());
+        assertTrue(series.getAllowDuplicateXValues());
+        assertEquals(0, series.getItemCount());
+        assertEquals(Integer.MAX_VALUE, series.getMaximumItemCount());
+        assertEquals(null, series.getDescription());
+    }
+
+    @Test
+    public void ComparableObjectSeriesTest_AutoInitialization(){
+        series = new ComparableObjectSeries("XYZ");
+        assertEquals("XYZ", series.getKey());
+        assertTrue(series.getAutoSort());
+        assertTrue(series.getAllowDuplicateXValues());
+        assertEquals(0, series.getItemCount());
+        assertEquals(Integer.MAX_VALUE, series.getMaximumItemCount());
+        assertEquals(null, series.getDescription());
+    }
+
+    @Test
+    public void SetMaximumItemCount_ValidNum(){
+        series = new ComparableObjectSeries(key);
+
+        series.setMaximumItemCount(5);
+
+        int actual = series.getMaximumItemCount();
+        assertEquals(actual, 5);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void SetMaximumItemCount_InvalidNum(){
+        series = new ComparableObjectSeries(key);
+        series.setMaximumItemCount(-1);
+    }
+
+    @Test
+    /// asserts that if the data size exceeds the maximum item count, data will be removed
+    // from the beginning of the series and fireSeriesChanged will be invoked.
+    public void SetMaximumItemCount_DataSizeExceedsMaxItemCount_RemoveData(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        series.add(1, null);
+        series.add(2, null);
+        series.add(3, null);
+
+        spySeries.setMaximumItemCount(1);
+
+        assertEquals(1, series.data.size());
+        assertEquals(0, series.indexOf(3));
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    public void SetKey_ValidKey_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.setKey("XYZ");
+
+        assertEquals("XYZ", series.getKey());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void SetKey_InvalidKey_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.setKey(null);
+    }
+
+    @Test
+    public void GetKey_ReturnsKey(){
+        series = new ComparableObjectSeries(key);
+        assertEquals(key, series.getKey());
+    }
+
+    @Test
+    public void GetNotify_ReturnsNotification(){
+        series = new ComparableObjectSeries(key);
+        series.setNotify(true);
+
+        assertTrue(series.getNotify());
+    }
+
+    @Test
+    public void GetDescription_ReturnsDescription(){
+        series = new ComparableObjectSeries(key);
+        series.setDescription("XYZ");
+
+        assertEquals("XYZ", series.getDescription());
+    }
+
+    @Test
+    public void GetItemCount_ReturnsDataSize() {
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+        series.add(3, null);
+
+        assertEquals(3, series.getItemCount());
+    }
+
+    @Test
+    public void GetItemCount_EmptySeries_ReturnsZero() {
+        series = new ComparableObjectSeries(key);
+
+        assertEquals(0, series.getItemCount());
     }
 
     @Test
@@ -43,6 +151,7 @@ public class ComparableObjectSeriesTest {
         assertEquals(2, actual);
     }
 
+    /// TODO: use the mock.
     @Test
     /// Passing a value at the beginning of an unsorted list
     public void IndexOf_IndexOfItemInUnsortedSeries_GetIndex(){
@@ -52,7 +161,6 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
-
         int actual = series.indexOf(4);
 
         assertEquals(0, actual);
@@ -64,6 +172,53 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
 
         series.update(2, null);
+    }
+
+    @Test
+    public void Update_MethodsAreInvokedWithCorrectParam(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.update(4, "ABC");
+
+        verify(item).setObject("ABC");
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    public void UpdateByIndex_MethodsAreInvokedWithCorrectParam(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(0, "ABC");
+
+        verify(item).setObject("ABC");
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void UpdateByIndex_IndexOutOfBounds_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(2, "ABC");
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void UpdateByIndex_NegativeIndex_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(-1, "ABC");
     }
 
     @Test
@@ -301,4 +456,5 @@ public class ComparableObjectSeriesTest {
 
         assertEquals(series1.getClass(), series2.getClass());
     }
+
 }
