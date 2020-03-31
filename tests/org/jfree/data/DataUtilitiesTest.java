@@ -83,7 +83,7 @@ public class DataUtilitiesTest {
     }
 
     @Test
-    public void caculateColumnTotal_IntValueTest(){
+    public void caculateColumnTotal2_IntValueTest(){
         Values2D values2D = Mockito.mock(Values2D.class);
         Mockito.when(values2D.getRowCount()).thenReturn(2);
         Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
@@ -95,7 +95,7 @@ public class DataUtilitiesTest {
     }
 
     @Test
-    public void calculateColumnTotal_DoubleValueTest(){
+    public void calculateColumnTotal2_DoubleValueTest(){
         Values2D values2D = Mockito.mock(Values2D.class);
         Mockito.when(values2D.getRowCount()).thenReturn(2);
         Mockito.when(values2D.getValue(0, 2)).thenReturn(2.2);
@@ -104,7 +104,7 @@ public class DataUtilitiesTest {
     }
 
     @Test
-    public void calculateColumnTotal_DoubleAndIntValueTest(){
+    public void calculateColumnTotal2_DoubleAndIntValueTest(){
         Values2D values2D = Mockito.mock(Values2D.class);
         Mockito.when(values2D.getRowCount()).thenReturn(3);
         Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
@@ -114,12 +114,13 @@ public class DataUtilitiesTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void calculateColumnTotal_NullValueTest(){
+    public void calculateColumnTotal2_NullValueTest(){
         Values2D values2D = Mockito.mock(Values2D.class);
         Mockito.when(values2D.getRowCount()).thenReturn(2);
         Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
         Mockito.when(values2D.getValue(1, 2)).thenReturn(3);
         double temp = DataUtilities.calculateColumnTotal(null, 2);
     }
+
 
 }
