@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
@@ -26,6 +27,13 @@ class DummyVetoableChangeListener implements VetoableChangeListener {
     }
 }
 
+class DummyPropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        /// do something
+    }
+}
 
 public class SeriesTest {
     String key;
@@ -81,4 +89,25 @@ public class SeriesTest {
         Mockito.verifyNoInteractions(spyListener);
     }
 
+    @Test
+    public void AddPropertyChangeListener() throws NoSuchFieldException {
+        PropertyChangeListener listener = new DummyPropertyChangeListener();
+        PropertyChangeListener spyListener = Mockito.spy(listener);
+
+        comparableSeries.addPropertyChangeListener(spyListener);
+        comparableSeries.firePropertyChange(null, null, null);
+
+        Mockito.verify(spyListener).propertyChange(Mockito.any());
+    }
+
+    @Test
+    public void RemovePropertyChangeListener() throws NoSuchFieldException {
+        PropertyChangeListener listener = new DummyPropertyChangeListener();
+        PropertyChangeListener spyListener = Mockito.spy(listener);
+
+        comparableSeries.removePropertyChangeListener(spyListener);
+        comparableSeries.firePropertyChange(null, null, null);
+
+        Mockito.verifyNoInteractions(spyListener);
+    }
 }
