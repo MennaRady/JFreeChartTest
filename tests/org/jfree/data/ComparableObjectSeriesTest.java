@@ -19,6 +19,39 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void SetMaximumItemCount_ValidNum(){
+        series = new ComparableObjectSeries(key);
+
+        series.setMaximumItemCount(5);
+
+        int actual = series.getMaximumItemCount();
+        assertEquals(actual, 5);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void SetMaximumItemCount_InvalidNum(){
+        series = new ComparableObjectSeries(key);
+        series.setMaximumItemCount(-1);
+    }
+
+    @Test
+    /// asserts that if the data size exceeds the maximum item count, data will be removed
+    // from the beginning of the series and fireSeriesChanged will be invoked.
+    public void SetMaximumItemCount_DataSizeExceedsMaxItemCount_RemoveData(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        series.add(1, null);
+        series.add(2, null);
+        series.add(3, null);
+
+        spySeries.setMaximumItemCount(1);
+
+        assertEquals(1, series.data.size());
+        assertEquals(0, series.indexOf(3));
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
     /// Passing a non-existing value
     public void IndexOf_GettingIndexOfNonExistingItem_NegativeValue(){
         series = new ComparableObjectSeries(key, true, false);
