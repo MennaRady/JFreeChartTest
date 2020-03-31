@@ -252,5 +252,31 @@ public class DataUtilitiesTest {
         double temp = DataUtilities.calculateRowTotal(null, 4);
     }
 
+    @Test
+    public void createNumberArray_StartOfArrayTest(){
+    double[] doubleArray = new double[]{1.0,2.5,3.1};
+    Number[] temp = DataUtilities.createNumberArray(doubleArray);
+    assertEquals(temp[0], doubleArray[0]);
+    }
+
+    @Test
+    public void createNumberArray_EndOfArrayTest(){
+        double[] doubleArray = new double[]{1.0,2.5,3.1};
+        Number[] temp = DataUtilities.createNumberArray(doubleArray);
+        assertEquals(temp[2], doubleArray[2]);
+    }
+
+    @Test
+    public void createNumberArray_LengthOfArrayTest(){
+        double[] doubleArray = new double[]{1.0,2.5,3.1,5,6};
+        Number[] temp = DataUtilities.createNumberArray(doubleArray);
+        assertEquals(temp.length, doubleArray.length);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createNumberArray_NullValueTest(){
+        Number[] temp = DataUtilities.createNumberArray(null);
+    }
+
 }
 
