@@ -81,6 +81,39 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void UpdateByIndex_MethodsAreInvokedWithCorrectParam(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(0, "ABC");
+
+        verify(item).setObject("ABC");
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void UpdateByIndex_IndexOutOfBounds_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(2, "ABC");
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void UpdateByIndex_NegativeIndex_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.updateByIndex(-1, "ABC");
+    }
+
+    @Test
     /// This test is to make sure that the start index of the data is deleted
     public void Delete_DeletingItemsFromStartToEndIndex_StartDeleted(){
         series = new ComparableObjectSeries(key);
