@@ -19,7 +19,7 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
-    public void ComparableObjectSeriesTest(){
+    public void ComparableObjectSeriesTest_InitializeAttributes(){
         series = new ComparableObjectSeries("XYZ", false, true);
         assertEquals("XYZ", series.getKey());
         assertFalse(series.getAutoSort());
@@ -71,6 +71,59 @@ public class ComparableObjectSeriesTest {
         assertEquals(1, series.data.size());
         assertEquals(0, series.indexOf(3));
         verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    public void SetKey_ValidKey_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.setKey("XYZ");
+
+        assertEquals("XYZ", series.getKey());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void SetKey_InvalidKey_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.setKey(null);
+    }
+
+    @Test
+    public void GetKey_ReturnsKey(){
+        series = new ComparableObjectSeries(key);
+        assertEquals(key, series.getKey());
+    }
+
+    @Test
+    public void GetNotify_ReturnsNotification(){
+        series = new ComparableObjectSeries(key);
+        series.setNotify(true);
+
+        assertTrue(series.getNotify());
+    }
+
+    @Test
+    public void GetDescription_ReturnsDescription(){
+        series = new ComparableObjectSeries(key);
+        series.setDescription("XYZ");
+
+        assertEquals("XYZ", series.getDescription());
+    }
+
+    @Test
+    public void GetItemCount_ReturnsDataSize() {
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+        series.add(3, null);
+
+        assertEquals(3, series.getItemCount());
+    }
+
+    @Test
+    public void GetItemCount_EmptySeries_ReturnsZero() {
+        series = new ComparableObjectSeries(key);
+
+        assertEquals(0, series.getItemCount());
     }
 
     @Test
