@@ -1,12 +1,13 @@
 package tests.org.jfree.data;
 import org.jfree.data.DataUtilities;
-import org.junit.Assert;
+import org.jfree.data.Values2D;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.mockito.Mockito;
 import java.util.Arrays;
-
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class DataUtilitiesTest {
     double[][] x,y;
@@ -81,5 +82,44 @@ public class DataUtilitiesTest {
         double[][] temp = DataUtilities.clone(null);
     }
 
+    @Test
+    public void caculateColumnTotal_IntValueTest(){
+        Values2D values2D = Mockito.mock(Values2D.class);
+        Mockito.when(values2D.getRowCount()).thenReturn(2);
+        Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
+        Mockito.when(values2D.getValue(1, 2)).thenReturn(2);
+        assertEquals(4.0,DataUtilities.calculateColumnTotal(values2D, 2), 0.0f);
+        verify(values2D).getRowCount();
+        verify(values2D).getValue(0, 2);
+        verify(values2D).getValue(1, 2);
+    }
+
+    @Test
+    public void calculateColumnTotal_DoubleValueTest(){
+        Values2D values2D = Mockito.mock(Values2D.class);
+        Mockito.when(values2D.getRowCount()).thenReturn(2);
+        Mockito.when(values2D.getValue(0, 2)).thenReturn(2.2);
+        Mockito.when(values2D.getValue(1, 2)).thenReturn(0.1);
+        assertEquals(2.3000000000000003,DataUtilities.calculateColumnTotal(values2D, 2), 0.0D);
+    }
+
+    @Test
+    public void calculateColumnTotal_DoubleAndIntValueTest(){
+        Values2D values2D = Mockito.mock(Values2D.class);
+        Mockito.when(values2D.getRowCount()).thenReturn(3);
+        Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
+        Mockito.when(values2D.getValue(1, 2)).thenReturn(3);
+        Mockito.when(values2D.getValue(2, 2)).thenReturn(0.5);
+        assertEquals(5.50000000000000005, DataUtilities.calculateColumnTotal(values2D,2),0.0D);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void calculateColumnTotal_NullValueTest(){
+        Values2D values2D = Mockito.mock(Values2D.class);
+        Mockito.when(values2D.getRowCount()).thenReturn(2);
+        Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
+        Mockito.when(values2D.getValue(1, 2)).thenReturn(3);
+        double temp = DataUtilities.calculateColumnTotal(null, 2);
+    }
 
 }
