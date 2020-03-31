@@ -203,6 +203,54 @@ public class DataUtilitiesTest {
         Mockito.when(values2D.getValue(2, 1)).thenReturn(3);
         double temp = DataUtilities.calculateColumnTotal(null, 2);
     }
+    @Test
+    public void calculateRow3_IntValueTest(){
+        //Whole array
+        int[] validColumns = {0,1};
+        Mockito.when(values2D.getColumnCount()).thenReturn(4);
+        Mockito.when(values2D.getValue(4, 0)).thenReturn(2);
+        Mockito.when(values2D.getValue(4, 1)).thenReturn(3);
+        assertEquals(5.0, DataUtilities.calculateRowTotal(values2D,4, validColumns), 1e-15);
+    }
+
+    @Test
+    public void calculateRowTotal3_DoubleValueTest(){
+        //Random elements within the array
+        int[] validColumns = {0,2};
+        Mockito.when(values2D.getColumnCount()).thenReturn(4);
+        Mockito.when(values2D.getValue(4, 0)).thenReturn(3.5);
+        Mockito.when(values2D.getValue(4, 2)).thenReturn(0.1);
+        assertEquals(3.6, DataUtilities.calculateRowTotal(values2D, 4, validColumns), 1e-15);
+    }
+
+    @Test
+    public void calculateRowTotal3_DoubleAndIntValueTest(){
+        //End of array
+        int[] validColumns = {2,3};
+        Mockito.when(values2D.getColumnCount()).thenReturn(4);
+        Mockito.when(values2D.getValue(4, 2)).thenReturn(3.5);
+        Mockito.when(values2D.getValue(4, 3)).thenReturn(3);
+        assertEquals(6.5, DataUtilities.calculateRowTotal(values2D, 4, validColumns), 1e-15);
+    }
+
+    @Test
+    public void calculateRowTotal3_OutOfBoundsArrayElementsTest(){
+        int[] validColumns = {4,5};
+        Mockito.when(values2D.getColumnCount()).thenReturn(2);
+        Mockito.when(values2D.getValue(2, 0)).thenReturn(10);
+        Mockito.when(values2D.getValue(2, 1)).thenReturn(5);
+        assertEquals(0.0, DataUtilities.calculateRowTotal(values2D, 2, validColumns), 1e-15);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void calculateRowTotal3_NullValueTest(){
+        //Random elements of the array
+        int[] validColumns = {0,3};
+        Mockito.when(values2D.getRowCount()).thenReturn(4);
+        Mockito.when(values2D.getValue(4, 0)).thenReturn(10);
+        Mockito.when(values2D.getValue(4, 3)).thenReturn(5);
+        double temp = DataUtilities.calculateRowTotal(null, 4);
+    }
 
 }
 
