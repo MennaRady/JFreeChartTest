@@ -30,6 +30,17 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void ComparableObjectSeriesTest_AutoInitialization(){
+        series = new ComparableObjectSeries("XYZ");
+        assertEquals("XYZ", series.getKey());
+        assertTrue(series.getAutoSort());
+        assertTrue(series.getAllowDuplicateXValues());
+        assertEquals(0, series.getItemCount());
+        assertEquals(Integer.MAX_VALUE, series.getMaximumItemCount());
+        assertEquals(null, series.getDescription());
+    }
+
+    @Test
     public void SetMaximumItemCount_ValidNum(){
         series = new ComparableObjectSeries(key);
 
