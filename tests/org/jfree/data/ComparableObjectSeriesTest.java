@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ComparableObjectSeriesTest {
     ComparableObjectSeries series;
@@ -43,6 +43,7 @@ public class ComparableObjectSeriesTest {
         assertEquals(2, actual);
     }
 
+    /// TODO: use the mock.
     @Test
     /// Passing a value at the beginning of an unsorted list
     public void IndexOf_IndexOfItemInUnsortedSeries_GetIndex(){
@@ -52,7 +53,6 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
-
         int actual = series.indexOf(4);
 
         assertEquals(0, actual);
@@ -64,6 +64,20 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
 
         series.update(2, null);
+    }
+
+    @Test
+    public void Update_MethodsAreInvokedWithCorrectParam(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(item).when(spySeries).getDataItem(0);
+
+        spySeries.update(4, "ABC");
+
+        verify(item).setObject("ABC");
+        verify(spySeries).fireSeriesChanged();
     }
 
     @Test
@@ -301,4 +315,5 @@ public class ComparableObjectSeriesTest {
 
         assertEquals(series1.getClass(), series2.getClass());
     }
+
 }
