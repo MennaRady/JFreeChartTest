@@ -307,6 +307,23 @@ public class ComparableObjectSeriesTest {
         Mockito.verify(spySeries).fireSeriesChanged();
     }
 
+    @Test
+    /// This test is to make sure that nothing is deleted if the end is greater than the start index.
+    public void Delete_StartGreaterThanEndIndex_ItemDeleted(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        int start = 2;
+        int end = 1;
+
+        spySeries.delete(start, end);
+
+        assertEquals(3, spySeries.data.size());
+        Mockito.verify(spySeries).fireSeriesChanged();
+    }
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void Delete_IndexExceedingTheSize_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
