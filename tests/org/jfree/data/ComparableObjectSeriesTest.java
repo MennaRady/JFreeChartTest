@@ -303,6 +303,32 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void Remove_RemoveByIndex_ItemRemoved(){
+        series.add(1, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+
+        Object actual = spySeries.remove(0);
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, spySeries.data.size());
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveItemOfNegativeIndex_ExceptionThrown(){
+        series.add(1, null);
+
+        Object actual = series.remove(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveItemOfIndexOutOfBounds_ExceptionThrown(){
+        series.add(1, null);
+
+        series.remove(2);
+    }
+
+    @Test
     public void Clear_ClearingSeries_AllDeleted(){
         series = new ComparableObjectSeries(key);
         series.add(1, null);
