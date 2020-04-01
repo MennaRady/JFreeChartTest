@@ -372,19 +372,24 @@ public class ComparableObjectSeriesTest {
         series.add(1, null);
         series.add(2, null);
         series.add(3, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
-        series.clear();
-        int actual = series.data.size();
+        spySeries.clear();
+        int actual = spySeries.data.size();
 
         assertEquals(0, actual);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
-    /* @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void Clear_EmptySeries_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
-        series.clear();
-    }*/
+        spySeries.clear();
+
+        Mockito.verify(spySeries, times(0)).fireSeriesChanged();
+    }
 
     @Test
     /// Passing same/identical series
