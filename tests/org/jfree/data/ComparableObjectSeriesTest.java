@@ -574,4 +574,71 @@ public class ComparableObjectSeriesTest {
         assertEquals(series1.getClass(), series2.getClass());
     }
 
+
+    //// Integration Tests
+    @Test
+    public void ClearTest(){
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+
+        series.clear();
+        int actual = series.data.size();
+
+        assertEquals(0, actual);
+    }
+
+    @Test
+    /// This test is to make sure that the all the required data is deleted
+    public void DeleteTest_Valid(){
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+        int start = 0;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        series.delete(start, end);
+
+        assertEquals(actual_size, series.data.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void DeleteTest_Invalid(){
+        series = new ComparableObjectSeries(key);
+        int start = 0;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        series.delete(start, end);
+
+        assertEquals(actual_size, series.data.size());
+    }
+
+    @Test
+    public void HashCodeTest(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries("123");
+        ComparableObjectSeries series2 = new ComparableObjectSeries("123");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(1, "4");
+        series2.add(1, "4");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(2, "5");
+        series2.add(2, "5");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(3, null);
+        series2.add(3, null);
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+    }
 }
