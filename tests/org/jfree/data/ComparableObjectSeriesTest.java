@@ -142,6 +142,22 @@ public class ComparableObjectSeriesTest {
         series.add(2, null);
     }
 
+    /// If the item was found in the series.
+    @Test
+    /// If the list was empty or the item's value is greater than all the existing items
+    public void Add_EmptySortedSeriesThatAllowsDuplication(){
+        series = new ComparableObjectSeries(key, true, false);
+        ComparableObjectItem mockedItem = Mockito.mock(ComparableObjectItem.class);
+
+
+        series.add(mockedItem, false);
+
+    }
+
+    @Test
+    public void Add_GreaterItemInSortedSeriesThatAllowsDuplication(){}
+    /// If the item's value is greater than all the existing items
+
     @Test
     /// Passing a non-existing value
     public void IndexOf_GettingIndexOfNonExistingItem_NegativeValue(){
@@ -179,6 +195,18 @@ public class ComparableObjectSeriesTest {
         assertEquals(0, actual);
     }
 
+    @Test
+    public void IndexOf_IndexOfNullItem_NegativeValue(){
+        series = new ComparableObjectSeries(key, false, false);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        Comparable obj = null;
+        int actual = series.indexOf(obj);
+
+        assertEquals(-1, actual);
+    }
+
     @Test(expected = SeriesException.class)
     public void Update_UpdatingNonExistingItem_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
@@ -199,6 +227,14 @@ public class ComparableObjectSeriesTest {
 
         verify(item).setObject("ABC");
         verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void Update_NullComparable_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+
+        series.update(null, "ABC");
     }
 
     @Test
@@ -397,6 +433,7 @@ public class ComparableObjectSeriesTest {
         assertTrue(actual instanceof ComparableObjectItem);
         assertEquals(1, spySeries.data.size());
         verify(spySeries).remove(1);
+        verify(spySeries).fireSeriesChanged();
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -641,4 +678,27 @@ public class ComparableObjectSeriesTest {
         assertEquals(series1, series2);
         assertEquals(series1.hashCode(), series2.hashCode());
     }
+
+    @Test
+    public void RemoveByValueTest(){
+        series.add(1, null);
+        series.add(2, null);
+        Comparable val = 2;
+
+        Object actual = series.remove(val);
+
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, series.data.size());
+    }
+
+    @Test
+    public void RemoveByIndexTest(){
+        series.add(1, null);
+        series.add(2, null);
+
+        Object actual = series.remove(0);
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, series.data.size());
+    }
+
 }
