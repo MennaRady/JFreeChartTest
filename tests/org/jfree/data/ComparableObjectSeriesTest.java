@@ -503,6 +503,14 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    /// Passing null object
+    public void Equals_NullObject_False(){
+        series = new ComparableObjectSeries(key);
+
+        assertFalse(series.equals(null));
+    }
+
+    @Test
     public void IsEmpty_EmptySeries_True(){
         series = new ComparableObjectSeries(key);
         assertTrue(series.isEmpty());
