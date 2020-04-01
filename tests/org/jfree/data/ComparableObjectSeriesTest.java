@@ -241,13 +241,15 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
 
-        series.delete(start, end);
-        int actual = series.indexOf(4);
+        spySeries.delete(start, end);
+        int actual = spySeries.indexOf(4);
         assertTrue(actual < 0);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test
@@ -257,13 +259,15 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
 
-        series.delete(start, end);
-        int actual = series.indexOf(2);
+        spySeries.delete(start, end);
+        int actual = spySeries.indexOf(2);
         assertTrue(actual < 0);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test
@@ -273,13 +277,34 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
         int actual_size = series.data.size() - (end - start) - 1;
 
-        series.delete(start, end);
-        assertEquals(actual_size, series.data.size());
+        spySeries.delete(start, end);
+        assertEquals(actual_size, spySeries.data.size());
+        Mockito.verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    /// This test is to make sure that the all the required data is deleted
+    public void Delete_StartEqualsEndIndex_ItemDeleted(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+
+        int start = 1;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        spySeries.delete(start, end);
+        assertEquals(actual_size, spySeries.data.size());
+        assertTrue(spySeries.indexOf(1) < 0); /// Item not found in series
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
