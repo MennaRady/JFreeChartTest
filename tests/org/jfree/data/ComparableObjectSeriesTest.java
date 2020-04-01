@@ -127,6 +127,21 @@ public class ComparableObjectSeriesTest {
         assertEquals(0, series.getItemCount());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void Add_IllegalArgument_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+
+        series.add(null, false);
+    }
+
+    @Test(expected = SeriesException.class)
+    public void Add_SortedSeriesThatDoNotAllowsDuplication_ExceptionThrown(){
+        series = new ComparableObjectSeries(key, true, false);
+
+        series.add(2, null);
+        series.add(2, null);
+    }
+
     @Test
     /// Passing a non-existing value
     public void IndexOf_GettingIndexOfNonExistingItem_NegativeValue(){
