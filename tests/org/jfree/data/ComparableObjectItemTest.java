@@ -36,6 +36,42 @@ public class ComparableObjectItemTest {
     }
 
     @Test
+    public void GetObject_ReturnsObject(){
+        Object obj = "123";
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals("123", item.getObject());
+    }
+
+    @Test
+    public void GetObject_Null_ReturnsNull(){
+        Object obj = null;
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals(null, item.getObject());
+    }
+
+    @Test
+    public void SetObject_ReturnsObject(){
+        Object obj = "123";
+        ComparableObjectItem item = new ComparableObjectItem(1, null);
+
+        item.setObject(obj);
+
+        assertEquals("123", item.getObject());
+    }
+
+    @Test
+    public void SetObject_Null_ReturnsNull(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        item.setObject(null);
+
+        assertEquals(null, item.getObject());
+    }
+
+    @Test
     public void CompareTo_ComparingToLargerValue_NegativeValue(){
         assertTrue(firstItem.compareTo(secondItem) < 0); //negative value
     }
