@@ -20,18 +20,33 @@ public class ComparableObjectItemTest {
     }
 
     @Test
-    public void CompareTo_ComparingToSmallerValue_NegativeValue(){
+    public void CompareTo_ComparingToLargerValue_NegativeValue(){
         assertTrue(firstItem.compareTo(secondItem) < 0); //negative value
     }
 
     @Test
-    public void CompareTo_ComparingToLargerValue_PositiveValue(){
+    public void CompareTo_ComparingToSmallerValue_PositiveValue(){
         assertTrue(secondItem.compareTo(firstItem) > 0); //positive value
     }
 
     @Test
     public void CompareTo_ItemsWithSameValues_Zero(){
         assertTrue(firstItem.compareTo(firstItem) == 0); //equals zero
+    }
+
+    @Test
+    public void CompareTo_ComparingToNegativeValue_PositiveValue(){
+        Comparable s = -2;
+        Object t = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(s, t);
+        assertEquals(item.getComparable(), -2);
+        assertTrue(firstItem.compareTo(item) > 0);
+    }
+
+    @Test
+    public void CompareTo_ObjecOfAnotherInstance_ReturnsOne(){
+        Object obj = new Object();
+        assertTrue(firstItem.compareTo(obj) == 1);
     }
 
     @Test
