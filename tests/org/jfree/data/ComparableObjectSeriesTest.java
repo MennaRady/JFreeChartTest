@@ -329,6 +329,29 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void Remove_RemoveByValue_ItemRemoved(){
+        series.add(1, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        Comparable val = 2;
+
+        Object actual = spySeries.remove(val);
+
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, spySeries.data.size());
+        verify(spySeries).remove(1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveNonExistingItem_ExceptionThrown(){
+        series.add(1, null);
+        series.add(2, null);
+        Comparable val = 3;
+
+        series.remove(val);
+    }
+
+    @Test
     public void Clear_ClearingSeries_AllDeleted(){
         series = new ComparableObjectSeries(key);
         series.add(1, null);
