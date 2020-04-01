@@ -20,6 +20,22 @@ public class ComparableObjectItemTest {
     }
 
     @Test
+    public void GetComparable_PositiveValue_ReturnsComparable(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals(1, item.getComparable());
+    }
+
+    @Test
+    public void GetComparable_NegativeValue_ReturnsComparable(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(-1, obj);
+
+        assertEquals(-1, item.getComparable());
+    }
+
+    @Test
     public void CompareTo_ComparingToLargerValue_NegativeValue(){
         assertTrue(firstItem.compareTo(secondItem) < 0); //negative value
     }
