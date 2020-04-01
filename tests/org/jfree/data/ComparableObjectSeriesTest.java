@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -151,12 +152,9 @@ public class ComparableObjectSeriesTest {
         assertEquals(2, actual);
     }
 
-    /// TODO: use the mock.
     @Test
     /// Passing a value at the beginning of an unsorted list
     public void IndexOf_IndexOfItemInUnsortedSeries_GetIndex(){
-        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
-        when(item.getComparable()).thenReturn(4);
         series = new ComparableObjectSeries(key, false, false);
         series.add(4, null);
         series.add(0, null);
