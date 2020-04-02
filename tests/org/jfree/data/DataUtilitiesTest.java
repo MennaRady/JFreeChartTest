@@ -1,4 +1,4 @@
-package tests.org.jfree.data;
+package org.jfree.data;
 import org.jfree.data.DataUtilities;
 import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.KeyedValues;
