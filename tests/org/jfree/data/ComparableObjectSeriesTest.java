@@ -127,6 +127,61 @@ public class ComparableObjectSeriesTest {
         assertEquals(0, series.getItemCount());
     }
 
+    @Test
+    public void Add_UnsortedSeriesThatDoNotAllowsDuplication_AddItemAndNotify(){
+        ComparableObjectSeries series = new ComparableObjectSeries(key, false, false);
+        series.add(1, null);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(2).when(item).getComparable();
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        Mockito.doReturn(-1).when(spySeries).indexOf(2);
+
+        spySeries.add(item, true);
+
+        assertEquals(2, spySeries.data.size());
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    public void Add_UnsortedSeriesThatDoNotAllowsDuplication_AddItemAndDoNotNotify(){
+        ComparableObjectSeries series = new ComparableObjectSeries(key, false, false);
+        series.add(1, null);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(2).when(item).getComparable();
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        Mockito.doReturn(-1).when(spySeries).indexOf(2);
+
+        spySeries.add(item, false);
+
+        assertEquals(2, spySeries.data.size());
+        verify(spySeries, times(0)).fireSeriesChanged();
+    }
+
+    @Test(expected = SeriesException.class)
+    public void Add_DupliactedItemToUnsortedSeriesThatDoNotAllowsDuplication_ExceptionThrown(){
+        series = new ComparableObjectSeries(key, false, false);
+
+        series.add(1, null);
+        series.add(1, null);
+    }
+
+    @Test
+    public void Add_ItemsExceedTheMaxItemCount_AddTheNewItemAndDeleteTheFirstItem(){
+        ComparableObjectSeries series = new ComparableObjectSeries(key, false, false);
+        series.add(1, null);
+        series.setMaximumItemCount(1);
+        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
+        Mockito.doReturn(2).when(item).getComparable();
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        Mockito.doReturn(-1).when(spySeries).indexOf(2);
+
+        spySeries.add(item, true);
+
+        assertEquals(1, spySeries.data.size());
+        assertTrue(spySeries.indexOf(1) < 0);   /// Item with comparable 1 removed.
+        verify(spySeries).fireSeriesChanged();
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void Add_IllegalArgument_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
@@ -141,22 +196,6 @@ public class ComparableObjectSeriesTest {
         series.add(2, null);
         series.add(2, null);
     }
-
-    /// If the item was found in the series.
-    @Test
-    /// If the list was empty or the item's value is greater than all the existing items
-    public void Add_EmptySortedSeriesThatAllowsDuplication(){
-        series = new ComparableObjectSeries(key, true, false);
-        ComparableObjectItem mockedItem = Mockito.mock(ComparableObjectItem.class);
-
-
-        series.add(mockedItem, false);
-
-    }
-
-    @Test
-    public void Add_GreaterItemInSortedSeriesThatAllowsDuplication(){}
-    /// If the item's value is greater than all the existing items
 
     @Test
     /// Passing a non-existing value
