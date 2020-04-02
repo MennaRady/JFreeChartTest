@@ -20,18 +20,85 @@ public class ComparableObjectItemTest {
     }
 
     @Test
-    public void CompareTo_ComparingToSmallerValue_NegativeValue(){
+    public void GetComparable_PositiveValue_ReturnsComparable(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals(1, item.getComparable());
+    }
+
+    @Test
+    public void GetComparable_NegativeValue_ReturnsComparable(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(-1, obj);
+
+        assertEquals(-1, item.getComparable());
+    }
+
+    @Test
+    public void GetObject_ReturnsObject(){
+        Object obj = "123";
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals("123", item.getObject());
+    }
+
+    @Test
+    public void GetObject_Null_ReturnsNull(){
+        Object obj = null;
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        assertEquals(null, item.getObject());
+    }
+
+    @Test
+    public void SetObject_ReturnsObject(){
+        Object obj = "123";
+        ComparableObjectItem item = new ComparableObjectItem(1, null);
+
+        item.setObject(obj);
+
+        assertEquals("123", item.getObject());
+    }
+
+    @Test
+    public void SetObject_Null_ReturnsNull(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(1, obj);
+
+        item.setObject(null);
+
+        assertEquals(null, item.getObject());
+    }
+
+    @Test
+    public void CompareTo_ComparingToLargerValue_NegativeValue(){
         assertTrue(firstItem.compareTo(secondItem) < 0); //negative value
     }
 
     @Test
-    public void CompareTo_ComparingToLargerValue_PositiveValue(){
+    public void CompareTo_ComparingToSmallerValue_PositiveValue(){
         assertTrue(secondItem.compareTo(firstItem) > 0); //positive value
     }
 
     @Test
     public void CompareTo_ItemsWithSameValues_Zero(){
         assertTrue(firstItem.compareTo(firstItem) == 0); //equals zero
+    }
+
+    @Test
+    public void CompareTo_ComparingToNegativeValue_PositiveValue(){
+        Comparable s = -2;
+        Object t = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(s, t);
+        assertEquals(item.getComparable(), -2);
+        assertTrue(firstItem.compareTo(item) > 0);
+    }
+
+    @Test
+    public void CompareTo_ObjecOfAnotherInstance_ReturnsOne(){
+        Object obj = new Object();
+        assertTrue(firstItem.compareTo(obj) == 1);
     }
 
     @Test

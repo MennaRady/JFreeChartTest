@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -126,6 +127,37 @@ public class ComparableObjectSeriesTest {
         assertEquals(0, series.getItemCount());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void Add_IllegalArgument_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+
+        series.add(null, false);
+    }
+
+    @Test(expected = SeriesException.class)
+    public void Add_SortedSeriesThatDoNotAllowsDuplication_ExceptionThrown(){
+        series = new ComparableObjectSeries(key, true, false);
+
+        series.add(2, null);
+        series.add(2, null);
+    }
+
+    /// If the item was found in the series.
+    @Test
+    /// If the list was empty or the item's value is greater than all the existing items
+    public void Add_EmptySortedSeriesThatAllowsDuplication(){
+        series = new ComparableObjectSeries(key, true, false);
+        ComparableObjectItem mockedItem = Mockito.mock(ComparableObjectItem.class);
+
+
+        series.add(mockedItem, false);
+
+    }
+
+    @Test
+    public void Add_GreaterItemInSortedSeriesThatAllowsDuplication(){}
+    /// If the item's value is greater than all the existing items
+
     @Test
     /// Passing a non-existing value
     public void IndexOf_GettingIndexOfNonExistingItem_NegativeValue(){
@@ -151,12 +183,9 @@ public class ComparableObjectSeriesTest {
         assertEquals(2, actual);
     }
 
-    /// TODO: use the mock.
     @Test
     /// Passing a value at the beginning of an unsorted list
     public void IndexOf_IndexOfItemInUnsortedSeries_GetIndex(){
-        ComparableObjectItem item = Mockito.mock(ComparableObjectItem.class);
-        when(item.getComparable()).thenReturn(4);
         series = new ComparableObjectSeries(key, false, false);
         series.add(4, null);
         series.add(0, null);
@@ -164,6 +193,18 @@ public class ComparableObjectSeriesTest {
         int actual = series.indexOf(4);
 
         assertEquals(0, actual);
+    }
+
+    @Test
+    public void IndexOf_IndexOfNullItem_NegativeValue(){
+        series = new ComparableObjectSeries(key, false, false);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        Comparable obj = null;
+        int actual = series.indexOf(obj);
+
+        assertEquals(-1, actual);
     }
 
     @Test(expected = SeriesException.class)
@@ -186,6 +227,14 @@ public class ComparableObjectSeriesTest {
 
         verify(item).setObject("ABC");
         verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void Update_NullComparable_ExceptionThrown(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+
+        series.update(null, "ABC");
     }
 
     @Test
@@ -228,13 +277,15 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
 
-        series.delete(start, end);
-        int actual = series.indexOf(4);
+        spySeries.delete(start, end);
+        int actual = spySeries.indexOf(4);
         assertTrue(actual < 0);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test
@@ -244,13 +295,15 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
 
-        series.delete(start, end);
-        int actual = series.indexOf(2);
+        spySeries.delete(start, end);
+        int actual = spySeries.indexOf(2);
         assertTrue(actual < 0);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test
@@ -260,13 +313,51 @@ public class ComparableObjectSeriesTest {
         series.add(4, null);
         series.add(0, null);
         series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
         int start = 0;
         int end = 2;
         int actual_size = series.data.size() - (end - start) - 1;
 
-        series.delete(start, end);
-        assertEquals(actual_size, series.data.size());
+        spySeries.delete(start, end);
+        assertEquals(actual_size, spySeries.data.size());
+        Mockito.verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    /// This test is to make sure that the all the required data is deleted
+    public void Delete_StartEqualsEndIndex_ItemDeleted(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+
+        int start = 1;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        spySeries.delete(start, end);
+        assertEquals(actual_size, spySeries.data.size());
+        assertTrue(spySeries.indexOf(1) < 0); /// Item not found in series
+        Mockito.verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test
+    /// This test is to make sure that nothing is deleted if the end is greater than the start index.
+    public void Delete_StartGreaterThanEndIndex_ItemDeleted(){
+        series = new ComparableObjectSeries(key);
+        series.add(4, null);
+        series.add(0, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        int start = 2;
+        int end = 1;
+
+        spySeries.delete(start, end);
+
+        assertEquals(3, spySeries.data.size());
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -305,24 +396,79 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    public void Remove_RemoveByIndex_ItemRemoved(){
+        series.add(1, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+
+        Object actual = spySeries.remove(0);
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, spySeries.data.size());
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveItemOfNegativeIndex_ExceptionThrown(){
+        series.add(1, null);
+
+        Object actual = series.remove(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveItemOfIndexOutOfBounds_ExceptionThrown(){
+        series.add(1, null);
+
+        series.remove(2);
+    }
+
+    @Test
+    public void Remove_RemoveByValue_ItemRemoved(){
+        series.add(1, null);
+        series.add(2, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
+        Comparable val = 2;
+
+        Object actual = spySeries.remove(val);
+
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, spySeries.data.size());
+        verify(spySeries).remove(1);
+        verify(spySeries).fireSeriesChanged();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void Remove_RemoveNonExistingItem_ExceptionThrown(){
+        series.add(1, null);
+        series.add(2, null);
+        Comparable val = 3;
+
+        series.remove(val);
+    }
+
+    @Test
     public void Clear_ClearingSeries_AllDeleted(){
         series = new ComparableObjectSeries(key);
         series.add(1, null);
         series.add(2, null);
         series.add(3, null);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
-        series.clear();
-        int actual = series.data.size();
+        spySeries.clear();
+        int actual = spySeries.data.size();
 
         assertEquals(0, actual);
+        Mockito.verify(spySeries).fireSeriesChanged();
     }
 
-    /* @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void Clear_EmptySeries_ExceptionThrown(){
         series = new ComparableObjectSeries(key);
+        ComparableObjectSeries spySeries = Mockito.spy(series);
 
-        series.clear();
-    }*/
+        spySeries.clear();
+
+        Mockito.verify(spySeries, times(0)).fireSeriesChanged();
+    }
 
     @Test
     /// Passing same/identical series
@@ -411,6 +557,14 @@ public class ComparableObjectSeriesTest {
     }
 
     @Test
+    /// Passing null object
+    public void Equals_NullObject_False(){
+        series = new ComparableObjectSeries(key);
+
+        assertFalse(series.equals(null));
+    }
+
+    @Test
     public void IsEmpty_EmptySeries_True(){
         series = new ComparableObjectSeries(key);
         assertTrue(series.isEmpty());
@@ -455,6 +609,96 @@ public class ComparableObjectSeriesTest {
         series2 = (ComparableObjectSeries) series1.clone();
 
         assertEquals(series1.getClass(), series2.getClass());
+    }
+
+
+    //// Integration Tests
+    @Test
+    public void ClearTest(){
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+
+        series.clear();
+        int actual = series.data.size();
+
+        assertEquals(0, actual);
+    }
+
+    @Test
+    /// This test is to make sure that the all the required data is deleted
+    public void DeleteTest_Valid(){
+        series = new ComparableObjectSeries(key);
+        series.add(1, null);
+        series.add(2, null);
+        int start = 0;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        series.delete(start, end);
+
+        assertEquals(actual_size, series.data.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void DeleteTest_Invalid(){
+        series = new ComparableObjectSeries(key);
+        int start = 0;
+        int end = 1;
+        int actual_size = series.data.size() - (end - start) - 1;
+
+        series.delete(start, end);
+
+        assertEquals(actual_size, series.data.size());
+    }
+
+    @Test
+    public void HashCodeTest(){
+        ComparableObjectSeries series1 = new ComparableObjectSeries("123");
+        ComparableObjectSeries series2 = new ComparableObjectSeries("123");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(1, "4");
+        series2.add(1, "4");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(2, "5");
+        series2.add(2, "5");
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+
+        series1.add(3, null);
+        series2.add(3, null);
+
+        assertEquals(series1, series2);
+        assertEquals(series1.hashCode(), series2.hashCode());
+    }
+
+    @Test
+    public void RemoveByValueTest(){
+        series.add(1, null);
+        series.add(2, null);
+        Comparable val = 2;
+
+        Object actual = series.remove(val);
+
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, series.data.size());
+    }
+
+    @Test
+    public void RemoveByIndexTest(){
+        series.add(1, null);
+        series.add(2, null);
+
+        Object actual = series.remove(0);
+        assertTrue(actual instanceof ComparableObjectItem);
+        assertEquals(1, series.data.size());
     }
 
 }
