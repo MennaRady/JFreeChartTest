@@ -1,26 +1,88 @@
 package tests.org.jfree.data;
 import org.jfree.data.DataUtilities;
+import org.jfree.data.DefaultKeyedValues;
+import org.jfree.data.KeyedValues;
 import org.jfree.data.Values2D;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import java.util.Arrays;
+import java.util.List;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
+class DummyKeyedValues implements KeyedValues{
+    double[] dummyArray = new double[]{1,2,1};
+    double[] keys = new double[]{1,2,3};
+
+    @Override
+    public Comparable getKey(int i) {
+        return keys[i];
+    }
+
+    @Override
+    public int getIndex(Comparable comparable) {
+        return 0;
+    }
+
+    @Override
+    public List getKeys() {
+        return null;
+    }
+
+    @Override
+    public Number getValue(Comparable comparable) {
+        return null;
+    }
+
+    @Override
+    public int getItemCount() {
+        return 3;
+    }
+
+    @Override
+    public Number getValue(int i) {
+        return dummyArray[i];
+    }
+}
+
+class DummyValues2D implements Values2D{
+    double[][] dummy = {{1,2,3},{5,6,7}};
+
+    @Override
+    public int getRowCount() {
+        return 2;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 3;
+    }
+
+    @Override
+    public Number getValue(int i, int i1) {
+        return dummy[i][i1];
+    }
+}
+
 public class DataUtilitiesTest {
     double[][] x,y;
+    Comparable a;
     Values2D values2D;
+    KeyedValues keyedValues;
+    DefaultKeyedValues defaultKeyedValues;
 
     @Before
     public void setUp(){
         x = new double[2][2];
         y = new double[2][2];
         values2D = Mockito.mock(Values2D.class);
+        keyedValues = Mockito.mock(KeyedValues.class);
+        defaultKeyedValues = Mockito.mock(DefaultKeyedValues.class);
     }
 
     @Test
-    public void equal_SameDimensionsTest(){
+    public void equal_Equivalent2DArraysTest(){
         assertTrue(DataUtilities.equal(x, y));
     }
 
@@ -33,8 +95,8 @@ public class DataUtilitiesTest {
 
     @Test
     public void equal_SameDimensionsNaNTest(){
-        x[0][0] = 0.0/0.0;
-        y[0][0] = 0.0/0.0;
+        x[0][0] = Double.NaN;
+        y[0][0] = Double.NaN;
         assertTrue(DataUtilities.equal(x, y));
 
     }
@@ -66,16 +128,10 @@ public class DataUtilitiesTest {
     }
 
     @Test
-    public void equal_SameDimensionsSameValues(){
-        x[0][0] = 1.5;
-        y[0][0] = 1.5;
-        assertTrue(DataUtilities.equal(x, y));
-    }
-
-    @Test
     public void cloneTest(){
         double[][] temp =  DataUtilities.clone(x);
         assertTrue(Arrays.deepEquals(temp, x));
+        assertNotSame(temp, x);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -109,6 +165,15 @@ public class DataUtilitiesTest {
         Mockito.when(values2D.getValue(1, 2)).thenReturn(3);
         Mockito.when(values2D.getValue(2, 2)).thenReturn(0.5);
         assertEquals(5.5, DataUtilities.calculateColumnTotal(values2D,2),1e-15);
+    }
+
+    @Test
+    public void calculateColumnTotal2_NegativeValueTest(){
+        Mockito.when(values2D.getRowCount()).thenReturn(3);
+        Mockito.when(values2D.getValue(0, 2)).thenReturn(2);
+        Mockito.when(values2D.getValue(1, 2)).thenReturn(-3);
+        Mockito.when(values2D.getValue(2, 2)).thenReturn(0.5);
+        assertEquals(-0.5, DataUtilities.calculateColumnTotal(values2D,2),1e-15);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -158,6 +223,14 @@ public class DataUtilitiesTest {
         assertEquals(0.0, DataUtilities.calculateColumnTotal(values2D, 2, validRows), 1e-15);
     }
 
+    @Test
+    public void calculateColumnTotal3_RepeatedRowElementsTest(){
+        int[] validRows = {5,5};
+        Mockito.when(values2D.getRowCount()).thenReturn(6);
+        Mockito.when(values2D.getValue(5, 6)).thenReturn(10);
+        assertEquals(20.0, DataUtilities.calculateColumnTotal(values2D, 6, validRows), 1e-15);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void calculateColumnTotal3_NullValueTest(){
         //Random elements of the array
@@ -166,6 +239,13 @@ public class DataUtilitiesTest {
         Mockito.when(values2D.getValue(0, 4)).thenReturn(10);
         Mockito.when(values2D.getValue(3, 4)).thenReturn(5);
         double temp = DataUtilities.calculateColumnTotal(null, 4);
+    }
+
+    @Test
+    public void calculateColumnTotal3_NegativeIndexTest(){
+        int[] validRows = {-3};
+        Mockito.when(values2D.getRowCount()).thenReturn(4);
+        assertEquals(0.0, DataUtilities.calculateColumnTotal(values2D, 4,validRows), 1e-15);
     }
 
     @Test
@@ -188,6 +268,15 @@ public class DataUtilitiesTest {
     }
 
     @Test
+    public void calculateRowTotal2_NegativeValueTest(){
+        Mockito.when(values2D.getColumnCount()).thenReturn(3);
+        Mockito.when(values2D.getValue(3, 0)).thenReturn(2);
+        Mockito.when(values2D.getValue(3, 1)).thenReturn(-3);
+        Mockito.when(values2D.getValue(3, 2)).thenReturn(0.5);
+        assertEquals(-0.5, DataUtilities.calculateRowTotal(values2D,3),1e-15);
+    }
+
+    @Test
     public void calculateRowTotal2_DoubleAndIntValueTest(){
         Mockito.when(values2D.getColumnCount()).thenReturn(3);
         Mockito.when(values2D.getValue(2, 0)).thenReturn(2);
@@ -203,6 +292,7 @@ public class DataUtilitiesTest {
         Mockito.when(values2D.getValue(2, 1)).thenReturn(3);
         double temp = DataUtilities.calculateColumnTotal(null, 2);
     }
+
     @Test
     public void calculateRow3_IntValueTest(){
         //Whole array
@@ -253,6 +343,21 @@ public class DataUtilitiesTest {
     }
 
     @Test
+    public void calculateRowTotal3_RepeatedIndexTest(){
+        int[] validColumns = {3,3};
+        Mockito.when(values2D.getColumnCount()).thenReturn(4);
+        Mockito.when(values2D.getValue(4, 3)).thenReturn(10);
+        assertEquals(20.0 , DataUtilities.calculateRowTotal(values2D, 4, validColumns) , 1e-15);
+    }
+
+    @Test
+    public void calculateRowTotal3_NegativeIndexTest(){
+        int[] validColumns = {-3};
+        Mockito.when(values2D.getColumnCount()).thenReturn(4);
+        assertEquals(0.0 , DataUtilities.calculateRowTotal(values2D, 4, validColumns) , 1e-15);
+    }
+
+    @Test
     public void createNumberArray_StartOfArrayTest(){
     double[] doubleArray = new double[]{1.0,2.5,3.1};
     Number[] temp = DataUtilities.createNumberArray(doubleArray);
@@ -273,16 +378,16 @@ public class DataUtilitiesTest {
         assertEquals(temp.length, doubleArray.length);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void createNumberArray_OutOfBoundsArrayTest(){
-        double[] doubleArray = new double[]{1.0,2.5,7.9};
-        Number[] temp = DataUtilities.createNumberArray(doubleArray);
-        assertEquals(temp[3], doubleArray[3]);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void createNumberArray_NullValueTest(){
         Number[] temp = DataUtilities.createNumberArray(null);
+    }
+
+    @Test
+    public void createNumberArray_EmptyArrayTest(){
+        double[] doubleArray = new double[]{};
+        assertEquals(0, DataUtilities.createNumberArray(doubleArray).length);
+        assertEquals(doubleArray.length, DataUtilities.createNumberArray(doubleArray).length);
     }
 
     @Test
@@ -311,5 +416,91 @@ public class DataUtilitiesTest {
         Number[][] temp = DataUtilities.createNumberArray2D(null);
     }
 
+    @Test
+    public void createNumberArray2D_EmptyArrayTest(){
+        double[][] doubleArray = new double[][]{};
+        assertEquals(0, DataUtilities.createNumberArray2D(doubleArray).length);
+        assertEquals(doubleArray.length, DataUtilities.createNumberArray2D(doubleArray).length);
+
+    }
+
+    @Test
+    public void getCumulativePercentage_Test(){
+        Mockito.when(keyedValues.getValue(0)).thenReturn(3);
+        Mockito.when(keyedValues.getValue(1)).thenReturn(1);
+        Mockito.when(keyedValues.getValue(2)).thenReturn(4);
+        Mockito.when(keyedValues.getKey(0)).thenReturn(0);
+        Mockito.when(keyedValues.getKey(1)).thenReturn(1);
+        Mockito.when(keyedValues.getKey(2)).thenReturn(2);
+        Mockito.when(keyedValues.getItemCount()).thenReturn(3);
+        assertEquals(0.375, DataUtilities.getCumulativePercentages(keyedValues).getValue(0));
+        assertEquals(0.5, DataUtilities.getCumulativePercentages(keyedValues).getValue(1));
+        assertEquals(1.0, DataUtilities.getCumulativePercentages(keyedValues).getValue(2));
+    }
+
+    //// Integration tests
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void calculateColumnTotal2_NegativeIndexTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        DataUtilities.calculateColumnTotal(dummyValues2D, -2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void calculateColumnTotal2_OutOfBoundsTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        DataUtilities.calculateColumnTotal(dummyValues2D, 6);
+    }
+
+    @Test
+    public void calculateColumnTotal2_ValidTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        assertEquals(6.0, DataUtilities.calculateColumnTotal(dummyValues2D, 0), 1e-15);
+    }
+
+    @Test
+    public void calculateColumnTotal3_ValidTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        int[] validRows = {0};
+        assertEquals(1.0, DataUtilities.calculateColumnTotal(dummyValues2D, 0,validRows), 1e-15);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void calculateRowTotal2_NegativeIndexTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        DataUtilities.calculateRowTotal(dummyValues2D, -2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void calculateRowTotal2_OutOfBoundsTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        DataUtilities.calculateRowTotal(dummyValues2D, 6);
+    }
+
+    @Test
+    public void calculateRowTotal2_ValidTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        assertEquals(6.0, DataUtilities.calculateRowTotal(dummyValues2D, 0), 1e-15);
+    }
+
+    @Test
+    public void calculateRowTotal3_ValidTest(){
+        DummyValues2D dummyValues2D = new DummyValues2D();
+        int[] validColumn = {1};
+        assertEquals(6.0, DataUtilities.calculateColumnTotal(dummyValues2D, 1,validColumn), 1e-15);
+    }
+
+    @Test
+    public void getCumulativePercentage_ValidTest() {
+        Comparable i = 1, j = 2, k = 3;
+        double a = 0.25, b = 0.75 , c = 1;
+        DummyKeyedValues dummyKeyedValues = new DummyKeyedValues();
+        DefaultKeyedValues dkv = new DefaultKeyedValues();
+        dkv.setValue(i, a);
+        dkv.setValue(j, b);
+        dkv.setValue(k, c);
+        defaultKeyedValues = (DefaultKeyedValues) DataUtilities.getCumulativePercentages(dummyKeyedValues);
+        assertEquals(dkv.getValue(2) , defaultKeyedValues.getValue(2));
+        assertEquals(0.75, defaultKeyedValues.getValue(1));
+    }
 }
 
