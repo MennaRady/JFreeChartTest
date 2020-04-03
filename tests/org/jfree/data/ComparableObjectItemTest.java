@@ -35,8 +35,14 @@ public class ComparableObjectItemTest {
         assertEquals(-1, item.getComparable());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void GetComparable_NullValue_ExceptionThrown(){
+        Object obj = new Object();
+        ComparableObjectItem item = new ComparableObjectItem(null, obj);
+    }
+
     @Test
-    public void GetObject_ReturnsObject(){
+    public void GetObject_NormalObject_ReturnsObject(){
         Object obj = "123";
         ComparableObjectItem item = new ComparableObjectItem(1, obj);
 
