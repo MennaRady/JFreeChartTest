@@ -1,50 +1,11 @@
 package org.jfree.data;
-import org.jfree.data.DataUtilities;
-import org.jfree.data.DefaultKeyedValues;
-import org.jfree.data.KeyedValues;
-import org.jfree.data.Values2D;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import java.util.Arrays;
-import java.util.List;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
-
-class DummyKeyedValues implements KeyedValues{
-    double[] dummyArray = new double[]{1,2,1};
-    double[] keys = new double[]{1,2,3};
-
-    @Override
-    public Comparable getKey(int i) {
-        return keys[i];
-    }
-
-    @Override
-    public int getIndex(Comparable comparable) {
-        return 0;
-    }
-
-    @Override
-    public List getKeys() {
-        return null;
-    }
-
-    @Override
-    public Number getValue(Comparable comparable) {
-        return null;
-    }
-
-    @Override
-    public int getItemCount() {
-        return 3;
-    }
-
-    @Override
-    public Number getValue(int i) {
-        return dummyArray[i];
-    }
-}
 
 class DummyValues2D implements Values2D{
     double[][] dummy = {{1,2,3},{5,6,7}};
@@ -491,16 +452,19 @@ public class DataUtilitiesTest {
 
     @Test
     public void getCumulativePercentage_ValidTest() {
+        KeyedValues keyedValue;
         Comparable i = 1, j = 2, k = 3;
-        double a = 0.25, b = 0.75 , c = 1;
-        DummyKeyedValues dummyKeyedValues = new DummyKeyedValues();
-        DefaultKeyedValues dkv = new DefaultKeyedValues();
-        dkv.setValue(i, a);
-        dkv.setValue(j, b);
-        dkv.setValue(k, c);
-        defaultKeyedValues = (DefaultKeyedValues) DataUtilities.getCumulativePercentages(dummyKeyedValues);
-        assertEquals(dkv.getValue(2) , defaultKeyedValues.getValue(2));
-        assertEquals(0.75, defaultKeyedValues.getValue(1));
+        double a = 5, b = 2, c = 3;
+        DefaultKeyedValues defaultKeyedValues = new DefaultKeyedValues();
+        defaultKeyedValues.addValue(i, a);
+        defaultKeyedValues.addValue(j, b);
+        defaultKeyedValues.addValue(k, c);
+
+        keyedValue = DataUtilities.getCumulativePercentages(defaultKeyedValues);
+
+        assertEquals(0.5, keyedValue.getValue(0));
+        assertEquals(0.7, keyedValue.getValue(1));
+        assertEquals(1.0, keyedValue.getValue(2));
     }
 }
 
